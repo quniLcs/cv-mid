@@ -14,16 +14,16 @@ def initialize(model):
             nn.init.zeros_(module.bias)
 
 
-def descent_lr(lr, optimizer, ind_epoch, interval):
-    lr = lr * (0.1 ** (ind_epoch // interval))
+def descent_lr(lr, optimizer, ind_epoch):
+    lr = lr * 2 ** (-ind_epoch / 5)
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
 
 
-def optimize(model, criterion, optimizer, train_loader, lr, ind_epoch, interval, device):
+def optimize(model, criterion, optimizer, train_loader, lr, ind_epoch, device):
     model.train()
 
-    descent_lr(lr, optimizer, ind_epoch, interval)
+    descent_lr(lr, optimizer, ind_epoch)
 
     for data in train_loader:
         inputs = data[0].to(device)
