@@ -1,32 +1,19 @@
 import torch
-from torch import nn
 
 from cutout import cutout
 from mixup import mixup
 from cutmix import cutmix
 
 
-def initialize(model):
-    for module in model.modules():
-        if isinstance(module, nn.Conv2d) or isinstance(module, nn.Linear):
-            nn.init.kaiming_normal_(module.weight)
-            if module.bias is not None:
-                nn.init.zeros_(module.bias)
-
-        elif isinstance(module, nn.BatchNorm2d) or isinstance(module, nn.BatchNorm1d):
-            nn.init.ones_(module.weight)
-            nn.init.zeros_(module.bias)
-
-
-def descent_lr(lr, ind_epoch, optimizer):
-    lr = lr * 2 ** (-ind_epoch / 5)
+def descent_lr(lr, ind_epoch, interval, optimizer):
+    lr = lr * 0.1 ** (ind_epoch // interval)
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
 
 
-def optimize(model, criterion, optimizer, train_loader, lr, ind_epoch, mode, device):
+def optimize(model, criterion, optimizer, train_loader, lr, ind_epoch, interval, mode, device):
     model.train()
-    descent_lr(lr, ind_epoch, optimizer)
+    descent_lr(lr, ind_epoch, interval, optimizer)
 
     for inputs, targets in train_loader:
         inputs = inputs.to(device)
@@ -36,7 +23,7 @@ def optimize(model, criterion, optimizer, train_loader, lr, ind_epoch, mode, dev
             outputs = model(inputs)
             loss = criterion(outputs, targets)
         elif mode == 'cutout':
-            cutout(inputs)
+            cutout(inputs, device = device)
             outputs = model(inputs)
             loss = criterion(outputs, targets)
         elif mode == 'mixup':
@@ -58,7 +45,8 @@ def evaluate(model, criterion, data_loader, device):
 
     count = 0
     losses = 0
-    correct = 0
+    correct_t1 = 0
+    correct_t5 = 0
 
     for inputs, targets in data_loader:
         inputs = inputs.to(device)
@@ -68,11 +56,13 @@ def evaluate(model, criterion, data_loader, device):
         loss = criterion(outputs, targets)
 
         count += inputs.shape[0]
-        _, pred = outputs.max(dim = 1)
-        correct += pred.eq(targets).sum().item()
-        losses += loss.item() * count
+        _, pred_t1 = outputs.max(dim = 1)
+        _, pred_t5 = torch.topk(outputs, k = 5, dim = 1)
+        correct_t1 += pred_t1.eq(targets).sum().item()
+        correct_t5 += pred_t5.eq(torch.unsqueeze(targets, 1).repeat(1, 5)).sum().item()
+        losses += loss.item() * inputs.shape[0]
 
-    return correct / count, losses / count
+    return correct_t1 / count, correct_t5 / count, losses / count
 
 
 def save_status(model, optimizer, path):
