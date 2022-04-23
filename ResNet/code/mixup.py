@@ -31,15 +31,18 @@ if __name__ == '__main__':
         for i in range(3):
             img = np.transpose(inputs[i], (1, 2, 0))
             plt.imshow(img * 0.5 + 0.5)
+            plt.axis('off')
             plt.show()
 
             img = np.transpose(inputs[index[i]], (1, 2, 0))
             plt.imshow(img * 0.5 + 0.5)
+            plt.axis('off')
             plt.savefig('baseline' + str(i + 3) + '.png')
             plt.show()
 
             img = np.transpose(inputs_mixup[i], (1, 2, 0))
             plt.imshow(img * 0.5 + 0.5)
+            plt.axis('off')
             plt.savefig('mixup' + str(i) + '.png')
             plt.show()
 

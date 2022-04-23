@@ -5,11 +5,11 @@ import matplotlib.pyplot as plt
 from load import load
 
 
-def cutout(inputs, length = 16):
+def cutout(inputs, length = 16, device = torch.device('cpu')):
     n, c, h, w = inputs.shape
 
     for i in range(n):
-        mask = torch.ones(h, w)
+        mask = torch.ones(h, w).to(device)
 
         y = np.random.randint(h)
         x = np.random.randint(w)
@@ -43,6 +43,7 @@ if __name__ == '__main__':
         for i in range(3):
             img = np.transpose(inputs[i], (1, 2, 0))
             plt.imshow(img * 0.5 + 0.5)
+            plt.axis('off')
             plt.savefig('cutout' + str(i) + '.png')
             plt.show()
 

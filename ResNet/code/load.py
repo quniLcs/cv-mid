@@ -31,6 +31,7 @@ if __name__ == '__main__':
         for i in range(3):
             img = np.transpose(inputs[i], (1, 2, 0))
             plt.imshow(img * 0.5 + 0.5)
+            plt.axis('off')
             plt.savefig('baseline' + str(i) + '.png')
             plt.show()
 

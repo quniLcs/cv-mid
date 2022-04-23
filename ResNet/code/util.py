@@ -5,15 +5,8 @@ from mixup import mixup
 from cutmix import cutmix
 
 
-def descent_lr(lr, ind_epoch, interval, optimizer):
-    lr = lr * 0.1 ** (ind_epoch // interval)
-    for param_group in optimizer.param_groups:
-        param_group['lr'] = lr
-
-
-def optimize(model, criterion, optimizer, train_loader, lr, ind_epoch, interval, mode, device):
+def optimize(model, criterion, optimizer, train_loader, mode, device):
     model.train()
-    descent_lr(lr, ind_epoch, interval, optimizer)
 
     for inputs, targets in train_loader:
         inputs = inputs.to(device)

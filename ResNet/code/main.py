@@ -13,14 +13,14 @@ if __name__ == "__main__":
     # python main.py --mode cutout
     # python main.py --mode mixup
     # python main.py --mode cutmix
-
     parser = argparse.ArgumentParser()
     parser.add_argument("--batch_size", default = 128, type = int)
-    parser.add_argument("--num_epoch", default = 30, type = int)
+    parser.add_argument("--num_epoch", default = 40, type = int)
     parser.add_argument("--lr", default = 0.1, type = float)
-    parser.add_argument("--interval", default = 10, type = int)
+    parser.add_argument("--milestones", default = range(10, 40, 10), type = list)
+    parser.add_argument("--gamma", default = 0.2, type = float)
     parser.add_argument("--momentum", default = 0.9, type = float)
-    parser.add_argument("--lambd", default = 0.005, type = float)
+    parser.add_argument("--lambd", default = 5e-4, type = float)
     parser.add_argument("--mode", default = 'baseline', type = str)
     args = parser.parse_args()
 
@@ -35,12 +35,14 @@ if __name__ == "__main__":
     model = ResNet(num_classes = 100).to(device)
 
     optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum = args.momentum, weight_decay = args.lambd)
+    scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones = args.milestones, gamma = args.gamma)
     criterion = nn.CrossEntropyLoss()
     writer = SummaryWriter(args.mode)
 
     print('Epoch\tTrain top1\tTrain top5\tTest top1\tTest top5\t')
     for ind_epoch in range(args.num_epoch):
-        optimize(model, criterion, optimizer, train_loader, args.lr, ind_epoch, args.interval, args.mode, device)
+        optimize(model, criterion, optimizer, train_loader, args.mode, device)
+        scheduler.step()
 
         train_acc_t1, train_acc_t5, train_loss = evaluate(model, criterion, train_loader, device)
         test_acc_t1, test_acc_t5, test_loss = evaluate(model, criterion, test_loader, device)
