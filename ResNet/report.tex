@@ -1,6 +1,8 @@
 \documentclass{article}
 \usepackage{ctex}
 \usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{amsmath}
 
 \title{ResNet-18与CIFAR-100}
 \author{王逸群 19307110397}
@@ -41,15 +43,15 @@ GitHub repo 链接：https://github.com/quniLcs/cv-mid
 \end{figure}
 
 对于输入的图像，
-先进行步长为2的$3\times64\times3\times3$卷积操作，
+先进行步长为1的$3\times64\times3\times3$卷积操作，
 并进行批归一化和激活，
-维度变为$64\times16\times16$；；
+维度变为$64\times32\times32$；
 接着通过两次第一种单元结构，维度不变；
-再通过第二种单元结构，维度变为$128\times8\times8$；
+再通过第二种单元结构，维度变为$128\times16\times16$；
 再通过第一种单元结构，维度不变；
-再通过第二种单元结构，维度变为$256\times4\times4$；
+再通过第二种单元结构，维度变为$256\times8\times8$；
 再通过第一种单元结构，维度不变；
-再通过第二种单元结构，维度变为$512\times2\times2$；
+再通过第二种单元结构，维度变为$512\times4\times4$；
 再通过第一种单元结构，维度不变；
 最后通过全连接得到输出。
 
@@ -61,15 +63,15 @@ GitHub repo 链接：https://github.com/quniLcs/cv-mid
 
 优化器：带有0.9动量的随机梯度下降算法；
 
-正则化参数：0.005；
+正则化参数：0.0005；
 
-回合数：30；
+回合数：40；
 
 批量大小：128；
 
 每回合循环数：391；
 
-总循环数：$ 30 \times 391 = 11730 $；
+总循环数：$ 40 \times 391 = 15640$；
 
 损失函数：交叉熵损失函数；
 
@@ -79,9 +81,99 @@ GitHub repo 链接：https://github.com/quniLcs/cv-mid
 
 \subsection{Cutout}
 
+该数据增强方法对于输入的图像，
+随机选取一点作为中心点，
+将其周围的正方形区域置为0。
+具体效果如图\ref{fig:DA}所示。
+
 \subsection{Mixup}
 
+该数据增强方法对一对输入的图像及标签进行凸组合，
+凸组合系数服从Beta分布。
+具体操作为，
+对样本$x_i$、$y_i$、$x_j$、$y_j$，
+凸组合系数$\lambda \sim Beta(\alpha, \alpha)$，
+产生新的样本和标签：
+\begin{align*}
+x &= \lambda x_i + (1 - \lambda) x_j \\
+y &= \lambda y_i + (1 - \lambda) y_j
+\end{align*}
+
+具体效果如图\ref{fig:DA}所示。
+
 \subsection{Cutmix}
+
+该数据增强方法结合了以上两种方法。
+具体操作为，
+对样本$x_i$、$y_i$、$x_j$、$y_j$，
+凸组合系数$\lambda \sim Beta(\alpha, \alpha)$，
+先从$ H \times W$的样本$x_i$中随机选取一点作为中心点，
+将其周围$ H \sqrt{1 - \lambda} \times W \sqrt{1 - \lambda}$
+的正方形区域置为样本$x_j$的值，
+即正方形区域面积占比为$ 1 - \lambda $。
+由于实际正方形区域可能超出样本区域，
+最后将$ \lambda $修正为保留原样本值的区域面积占比，
+并产生新的标签：
+\begin{align*}
+y &= \lambda y_i + (1 - \lambda) y_j
+\end{align*}
+
+具体效果如图\ref{fig:DA}所示。
+
+\begin{figure}[h]
+\begin{subfigure}{0.19\textwidth}
+\includegraphics[width=\linewidth]{figure/baseline0.png}
+\end{subfigure}
+\begin{subfigure}{0.19\textwidth}
+\includegraphics[width=\linewidth]{figure/baseline3.png}
+\end{subfigure}
+\begin{subfigure}{0.19\textwidth}
+\includegraphics[width=\linewidth]{figure/cutout0.png}
+\end{subfigure}
+\begin{subfigure}{0.19\textwidth}
+\includegraphics[width=\linewidth]{figure/mixup0.png}
+\end{subfigure}
+\begin{subfigure}{0.19\textwidth}
+\includegraphics[width=\linewidth]{figure/cutmix0.png}
+\end{subfigure}
+\begin{subfigure}{0.19\textwidth}
+\includegraphics[width=\linewidth]{figure/baseline1.png}
+\end{subfigure}
+\begin{subfigure}{0.19\textwidth}
+\includegraphics[width=\linewidth]{figure/baseline4.png}
+\end{subfigure}
+\begin{subfigure}{0.19\textwidth}
+\includegraphics[width=\linewidth]{figure/cutout1.png}
+\end{subfigure}
+\begin{subfigure}{0.19\textwidth}
+\includegraphics[width=\linewidth]{figure/mixup1.png}
+\end{subfigure}
+\begin{subfigure}{0.19\textwidth}
+\includegraphics[width=\linewidth]{figure/cutmix1.png}
+\end{subfigure}
+\begin{subfigure}{0.19\textwidth}
+\includegraphics[width=\linewidth]{figure/baseline2.png}
+\caption{sample 1}
+\end{subfigure}
+\begin{subfigure}{0.19\textwidth}
+\includegraphics[width=\linewidth]{figure/baseline5.png}
+\caption{sample 2}
+\end{subfigure}
+\begin{subfigure}{0.19\textwidth}
+\includegraphics[width=\linewidth]{figure/cutout2.png}
+\caption{Cutout}
+\end{subfigure}
+\begin{subfigure}{0.19\textwidth}
+\includegraphics[width=\linewidth]{figure/mixup2.png}
+\caption{Mixup}
+\end{subfigure}
+\begin{subfigure}{0.19\textwidth}
+\includegraphics[width=\linewidth]{figure/cutmix2.png}
+\caption{CutMix}
+\end{subfigure}
+\caption{数据增强效果}
+\label{fig:DA}
+\end{figure}
 
 \section{实验结果}
 
