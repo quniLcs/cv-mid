@@ -1,5 +1,6 @@
 \documentclass{article}
 \usepackage{ctex}
+\usepackage{geometry}
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage{amsmath}
@@ -7,6 +8,8 @@
 \title{ResNet-18与CIFAR-100}
 \author{王逸群 19307110397}
 \date{2022.4.17}
+
+\geometry{a4paper,scale=0.75}
 
 \begin{document}
 
@@ -118,7 +121,7 @@ y &= \lambda y_i + (1 - \lambda) y_j
 y &= \lambda y_i + (1 - \lambda) y_j
 \end{align*}
 
-具体效果如图\ref{fig:DA}所示。
+具体效果如图\ref{fig:DAeffect}所示。
 
 \begin{figure}[h]
 \begin{subfigure}{0.19\textwidth}
@@ -172,9 +175,83 @@ y &= \lambda y_i + (1 - \lambda) y_j
 \caption{CutMix}
 \end{subfigure}
 \caption{数据增强效果}
-\label{fig:DA}
+\label{fig:DAeffect}
 \end{figure}
 
 \section{实验结果}
+
+实验结果如图\ref{fig:DAresult}和表\ref{table:DAresult}所示。
+
+\begin{figure}[h]
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width=\linewidth]
+{plot/baseline loss legend.png}
+\end{subfigure}
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width=\linewidth]
+{plot/baseline top1 legend.png}
+\end{subfigure}
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width=\linewidth]
+{plot/cutout loss legend.png}
+\end{subfigure}
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width=\linewidth]
+{plot/cutout top1 legend.png}
+\end{subfigure}
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width=\linewidth]
+{plot/mixup loss legend.png}
+\end{subfigure}
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width=\linewidth]
+{plot/mixup top1 legend.png}
+\end{subfigure}
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width=\linewidth]
+{plot/cutmix loss legend.png}
+\end{subfigure}
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width=\linewidth]
+{plot/cutmix top1 legend.png}
+\end{subfigure}
+\caption{实验结果}
+\label{fig:DAresult}
+\end{figure}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|c|} 
+\hline
+模型 
+& 训练集top1精确度 & 训练集top5精确度 
+& 测试集top1精确度 & 测试集top5精确度\\
+\hline
+baseline & 0.99982 & 1.00000 & 0.61110 & 0.84930 \\
+Cutout   & 0.99982 & 1.00000 & 0.65360 & 0.87540 \\
+Mixup    & 0.99980 & 1.00000 & 0.60050 & 0.81830 \\
+CutMix   & 0.99980 & 1.00000 & 0.63310 & 0.85980 \\
+\hline
+\end{tabular}
+\caption{实验结果}
+\label{table:DAresult}
+\end{table}
+
+可以看到，
+模型训练的难点在于，
+训练集的精确度快速达到近乎100\%，
+测试集的精确度便不再有上升的空间。
+数据增强的意义在于，
+加大训练集收敛的难度，
+使得测试集有更大的提升机会。
+
+例如，在第15个回合，
+baseline模型的训练集精确率达到了0.75324，
+但测试集精确率仅有0.46340；
+相比之下，
+cutout模型的训练集精确率仅有0.69558，
+但测试集精确率有0.51210。
+
+最后，mixup对模型没有明显提升，cutmix和cutout都优化了模型结果。
 
 \end{document}
