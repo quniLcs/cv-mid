@@ -5,7 +5,7 @@
 GitHub repo
 链接：[https://github.com/quniLcs/cv-mid](https://github.com/quniLcs/cv-mid)
 
-网盘链接：[https://pan.baidu.com/s/1aG9DZx2wrY5wyNLGOBk8LQ?pwd=exr2](https://pan.baidu.com/s/1aG9DZx2wrY5wyNLGOBk8LQ?pwd=exr2)
+网盘链接：[百度网盘-计算机视觉期中作业](https://pan.baidu.com/s/1aG9DZx2wrY5wyNLGOBk8LQ?pwd=exr2)
 
 ### 使用模块说明
 
@@ -64,4 +64,69 @@ python main.py --mode cutmix
 
 ## Faster R-CNN
 
+### 数据集
 
+```
+wget https://pjreddie.com/media/files/VOCtrainval_06-Nov-2007.tar
+wget https://pjreddie.com/media/files/VOCtest_06-Nov-2007.tar
+tar xf VOCtrainval_06-Nov-2007.tar
+tar xf VOCtest_06-Nov-2007.tar
+```
+
+### 预训练模型
+
+使用`Imagenet`上的预训练模型`vgg16`的卷积层参数。
+
+文件见百度网盘。
+
+### 训练模型
+
+运行`model_train.ipynb`文件。
+
+每个epoch的模型都记录在checkpoints中。
+
+### 测试模型
+
+运行`model_test.ipynb`文件。
+
+返回包括类别标签，得分，boundingbox的预测图片。
+
+## YOLOv3
+
+### 数据集
+
+```
+wget https://pjreddie.com/media/files/VOCtrainval_11-May-2012.tar
+wget https://pjreddie.com/media/files/VOCtrainval_06-Nov-2007.tar
+wget https://pjreddie.com/media/files/VOCtest_06-Nov-2007.tar
+tar xf VOCtrainval_11-May-2012.tar
+tar xf VOCtrainval_06-Nov-2007.tar
+tar xf VOCtest_06-Nov-2007.tar
+```
+
+通过`voc_label.py`，合并VOC2007，VOC2012的训练集与验证集。
+
+### 预训练模型
+
+使用`Imagenet`上的预训练模型`darknet53`的卷积层参数。
+
+```
+wget https://pjreddie.com/media/files/darknet53.conv.74
+```
+### 训练模型
+
+```
+./darknet detector train cfg/voc.data cfg/yolov3-voc.cfg darknet53.conv.74 | -gpu 0 tee train_yolov3.log
+```
+
+训练并记录训练日志。
+
+### 测试模型
+
+单张图片测试可以执行
+
+```
+./darknet detector test cfg/voc.data cfg/yolov3-voc.cfg backup/yolov3-voc_23500.weights <path/to/image>
+```
+
+对模型性能$mIoU, mAP$的验证可以调用`recall`、`validation`命令。
