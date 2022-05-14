@@ -5,7 +5,7 @@
 GitHub repo
 链接：[https://github.com/quniLcs/cv-mid](https://github.com/quniLcs/cv-mid)
 
-网盘链接：
+网盘链接：[https://pan.baidu.com/s/1aG9DZx2wrY5wyNLGOBk8LQ?pwd=exr2](https://pan.baidu.com/s/1aG9DZx2wrY5wyNLGOBk8LQ?pwd=exr2)
 
 ### 使用模块说明
 
@@ -61,3 +61,7 @@ python main.py --mode cutmix
 `momentum`：表示动量，默认值`0.9`；
 
 `lambd`：表示正则化参数，默认值`5e-4`。
+
+## Faster R-CNN
+
+
