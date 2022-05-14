@@ -83,13 +83,13 @@ tar xf VOCtest_06-Nov-2007.tar
 
 运行`model_train.ipynb`文件。
 
-每个epoch的模型都记录在checkpoints中。
+每个epoch的模型都记录在`checkpoints`中。
 
 ### 测试模型
 
 运行`model_test.ipynb`文件。
 
-返回包括类别标签，得分，boundingbox的预测图片。
+返回包括类别标签，得分，bounding box的预测图片。
 
 ## YOLOv3
 
@@ -129,4 +129,4 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
 ./darknet detector test cfg/voc.data cfg/yolov3-voc.cfg backup/yolov3-voc_23500.weights <path/to/image>
 ```
 
-对模型性能$mIoU, mAP$的验证可以调用`recall`、`validation`命令。
+对模型性能mIoU, mAP的验证可以调用`recall`、`validation`命令。
